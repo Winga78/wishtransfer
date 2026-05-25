@@ -27,13 +27,22 @@ services:
     environment:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
+      DB_HOST: db
       DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_URL: http://minio:9000
     depends_on:
       - db
+      - minio
     ports:
       - 3000:3000
+    volumes:
+      - ./backend:/usr/src/app           
+      - /usr/src/app/node_modules
+    command: npm run start:dev
 
 
   frontend:
@@ -56,21 +65,6 @@ services:
     volumes:
       - ./minio/data:/data
     command: server /data --console-address ":9001"
-
-  createbuckets:
-    image: quay.io/minio/mc:RELEASE.2025-03-12T17-29-24Z
-    depends_on:
-      - minio
-    restart: on-failure
-    entrypoint: >
-      /bin/sh -c "
-      sleep 5;
-      /usr/bin/mc alias set dockerminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
-      /usr/bin/mc mb --ignore-existing dockerminio/wishtransfer-app-bucket;
-      exit 0;
-      "
-
-
 
 volumes:
   pgdata:
