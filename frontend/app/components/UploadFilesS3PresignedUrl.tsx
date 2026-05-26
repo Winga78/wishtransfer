@@ -21,8 +21,7 @@ export function UploadFilesS3PresignedUrl({
       alert("Please, select file you want to upload");
       return;
     }
-
-    // OPTIMISATION : Array.from() est plus standard et performant que Object.values() pour un FileList
+    
     const files = Array.from(fileInputRef.current.files);
 
     // 2. Validate files
@@ -50,7 +49,7 @@ export function UploadFilesS3PresignedUrl({
       // SÉCURITÉ : Si l'API échoue ou renvoie un tableau vide
       if (!presignedUrls || presignedUrls.length === 0) {
         alert("Something went wrong, please try again later");
-        setIsLoading(false); // <--- CORRECTION : On coupe le loader ici !
+        setIsLoading(false);
         return;
       }
 

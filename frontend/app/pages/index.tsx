@@ -45,7 +45,7 @@ export default function Home() {
             files={files}
             fetchFiles={fetchFiles}
             setFiles={setFiles}
-            downloadUsingPresignedUrl={true} // Forcé à true par défaut
+            downloadUsingPresignedUrl={true}
           />
         </div>
       </main>
