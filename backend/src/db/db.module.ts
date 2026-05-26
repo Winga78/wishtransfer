@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ConfigurableModuleBuilder, Module } from '@nestjs/common';
 import { databaseProviders } from './db.providers'; 
 import { ConfigModule } from '@nestjs/config';
 @Module({
