@@ -2,7 +2,6 @@
 import { use, useEffect, useState } from 'react'
 import { type FileProps } from '../../utils/types'
 import { FilesContainer } from '../../components/FileContainer'
-import { UploadFilesS3PresignedUrl } from '../../components/UploadFilesS3PresignedUrl'
 
 export default function UploadPage({
   params,
@@ -20,7 +19,6 @@ export default function UploadPage({
         throw new Error(`Erreur HTTP: ${response.status}`)
       }
       const body = (await response.json()) as FileProps[]
-      // set isDeleting to false for all files after fetching
       setFiles(body.map((file) => ({ ...file, isDeleting: false })))
     } catch (error) {
       console.error("Erreur lors de la récupération des fichiers :", error)
@@ -44,8 +42,6 @@ export default function UploadPage({
           <FilesContainer
             files={files}
             pathfile={fullUrl}
-            fetchFiles={fetchFiles}
-            setFiles={setFiles}
             downloadUsingPresignedUrl={true}
           />
         </div>

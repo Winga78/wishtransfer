@@ -1,7 +1,7 @@
 import { type FilesListProps } from '../utils/types'
 import { FileItem } from './FileItem'
  
-export function FilesContainer({ files, pathfile,downloadUsingPresignedUrl }: FilesListProps) {
+export function FilesContainer({ files,pathfile,downloadUsingPresignedUrl }: FilesListProps) {
   if (files.length === 0) {
     return (
       <div className='flex h-96 flex-col items-center justify-center '>

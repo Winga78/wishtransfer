@@ -2,6 +2,7 @@ import { useState } from "react";
 import { type FileProps, FileItemProps } from "../utils/types";
 import { LoadSpinner } from "./LoadSpinner";
 import { deleteFileById } from "../utils/fileUploadHelpers";
+import { redirect } from "next/navigation";
 
 async function getPresignedUrl(file: FileProps) {
   const response = await fetch(`/api/files/download/presignedUrl/${file.id}`);
@@ -53,6 +54,8 @@ export function FileItem({
       console.log("Le fichier a bien été téléchargé avec succès !");
 
       await deleteFileById(file.id.toString());
+
+       redirect(`./`)
 
     } catch (error) {
       console.error("Échec du téléchargement :", error);
