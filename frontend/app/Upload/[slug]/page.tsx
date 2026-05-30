@@ -10,7 +10,7 @@ export default function UploadPage({
 }) {
   const { slug } = use(params)
   const [files, setFiles] = useState<FileProps[]>([])
-  const fullUrl = window.location.href
+  const [fullUrl, setFullUrl] = useState<string>('')
 
   const fetchFiles = async () => {
     try {
@@ -26,10 +26,10 @@ export default function UploadPage({
   }
 
     
-  useEffect(() => {
+useEffect(() => {
     fetchFiles()
-  }, [])
-
+    setFullUrl(window.location.href)
+}, [slug])
 
     return (
     <>

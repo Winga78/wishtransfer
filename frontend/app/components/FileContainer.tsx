@@ -18,6 +18,7 @@ export function FilesContainer({ files,pathfile,downloadUsingPresignedUrl }: Fil
       <ul className='h-80 overflow-auto'>
         {files.map((file) => (
           <FileItem
+            key={file.id}
             file={file}
             pathfile={pathfile}
             downloadUsingPresignedUrl={downloadUsingPresignedUrl}

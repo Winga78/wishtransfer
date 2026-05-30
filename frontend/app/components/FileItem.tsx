@@ -2,7 +2,7 @@ import { useState } from "react";
 import { type FileProps, FileItemProps } from "../utils/types";
 import { LoadSpinner } from "./LoadSpinner";
 import { deleteFileById } from "../utils/fileUploadHelpers";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 async function getPresignedUrl(file: FileProps) {
   const response = await fetch(`/api/files/download/presignedUrl/${file.id}`);
@@ -17,6 +17,7 @@ export function FileItem({
   
   // 1. État pour suivre le téléchargement
   const [isDownloading, setIsDownloading] = useState(false);
+  const router = useRouter();
 
   const downloadFile = async (file: FileProps) => {
     if (!downloadUsingPresignedUrl) return;
@@ -55,7 +56,7 @@ export function FileItem({
 
       await deleteFileById(file.id.toString());
 
-       redirect(`./`)
+      router.push("/");
 
     } catch (error) {
       console.error("Échec du téléchargement :", error);
