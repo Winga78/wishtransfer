@@ -1,15 +1,7 @@
-import { type FileProps } from "../utils/types";
+import { useState } from "react";
+import { type FileProps, FileItemProps } from "../utils/types";
 import { LoadSpinner } from "./LoadSpinner";
-import { formatBytes } from "../utils/fileUploadHelpers";
-
-type FileItemProps = {
-  file: FileProps;
-  fetchFiles: () => Promise<void>;
-  setFiles: (
-    files: FileProps[] | ((files: FileProps[]) => FileProps[]),
-  ) => void;
-  downloadUsingPresignedUrl: boolean;
-};
+import { deleteFileById } from "../utils/fileUploadHelpers";
 
 async function getPresignedUrl(file: FileProps) {
   const response = await fetch(`/api/files/download/presignedUrl/${file.id}`);
@@ -18,70 +10,81 @@ async function getPresignedUrl(file: FileProps) {
 
 export function FileItem({
   file,
-  fetchFiles,
-  setFiles,
+  pathfile,
   downloadUsingPresignedUrl,
 }: FileItemProps) {
-  async function deleteFile(id: string) {
-    setFiles((files: FileProps[]) =>
-      files.map((file: FileProps) =>
-        file.id === id ? { ...file, isDeleting: true } : file,
-      ),
-    );
-    try {
-      // delete file request to the server
-      await fetch(`/api/files/delete/${id}`, {
-        method: "DELETE",
-      });
-      // fetch files after deleting
-      await fetchFiles();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to delete file");
-    } finally {
-      setFiles((files: FileProps[]) =>
-        files.map((file: FileProps) =>
-          file.id === id ? { ...file, isDeleting: false } : file,
-        ),
-      );
-    }
-  }
   
+  // 1. État pour suivre le téléchargement
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const downloadFile = async (file: FileProps) => {
-    if (downloadUsingPresignedUrl) {
+    if (!downloadUsingPresignedUrl) return;
+
+    try {
+      setIsDownloading(true); // Le téléchargement commence
+
+      // Étape A : Récupérer l'URL présignée
       const presignedUrl = await getPresignedUrl(file);
-      window.open(presignedUrl, "_blank");
+
+      // Étape B : Télécharger le fichier REELLEMENT via le code (fetch)
+      const fileResponse = await fetch(presignedUrl);
+      
+      if (!fileResponse.ok) {
+        throw new Error("Erreur lors du téléchargement du fichier depuis le stockage");
+      }
+
+      // Convertir la réponse en Blob (données binaires brutes)
+      const blob = await fileResponse.blob();
+
+      // Étape C : Créer un lien invisible pour forcer le navigateur à télécharger le Blob
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = file.originalFileName; // Donne le vrai nom au fichier
+      
+      document.body.appendChild(link);
+      link.click(); // Déclenche le téléchargement du fichier physique
+
+      // Nettoyage de la mémoire
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      // C'EST GAGNÉ ! À ce stade, le fichier est entièrement sur le PC de l'utilisateur
+      console.log("Le fichier a bien été téléchargé avec succès !");
+
+      await deleteFileById(file.id.toString());
+
+    } catch (error) {
+      console.error("Échec du téléchargement :", error);
+      alert("Impossible de télécharger le fichier.");
+    } finally {
+      setIsDownloading(false); // On arrête le spinner, quoi qu'il arrive
     }
   };
 
   return (
     <li className="relative flex items-center justify-between gap-2 border-b py-2 text-sm">
-      <button
-        className="truncate text-blue-500 hover:text-blue-600 hover:underline  "
-        onClick={() => downloadFile(file)}
-      >
-        {file.originalFileName}
-      </button>
-
-      <div className=" flex items-center gap-2">
-        <span className="w-32 ">{formatBytes(file.fileSize)}</span>
-
-        <button
-          className="flex w-full flex-1 cursor-pointer items-center justify-center
-           rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600
-           disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={() => deleteFile(file.id)}
-          disabled={file.isDeleting}
-        >
-          Delete
-        </button>
+      <div>
+        <p className="font-medium">Share link</p>
+        <p className="text-xs text-gray-500">{pathfile}</p>
       </div>
-
-      {file.isDeleting && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-md bg-gray-900 bg-opacity-20">
-          <LoadSpinner size="small" />
-        </div>
-      )}
+      
+      <div className="flex items-center gap-2">
+        {/* 2. Affichage conditionnel du bouton ou du spinner */}
+        {isDownloading ? (
+          <div className="flex items-center gap-2 text-gray-400">
+            <LoadSpinner /> Téléchargement...
+          </div>
+        ) : (
+          <button
+            className="truncate text-blue-500 hover:text-blue-600 hover:underline disabled:opacity-50"
+            onClick={() => downloadFile(file)}
+            disabled={isDownloading}
+          >
+            {file.originalFileName}
+          </button>
+        )}
+      </div>
     </li>
   );
 }

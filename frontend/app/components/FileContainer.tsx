@@ -1,7 +1,7 @@
 import { type FilesListProps } from '../utils/types'
 import { FileItem } from './FileItem'
  
-export function FilesContainer({ files, fetchFiles, setFiles, downloadUsingPresignedUrl }: FilesListProps) {
+export function FilesContainer({ files, pathfile,downloadUsingPresignedUrl }: FilesListProps) {
   if (files.length === 0) {
     return (
       <div className='flex h-96 flex-col items-center justify-center '>
@@ -18,14 +18,12 @@ export function FilesContainer({ files, fetchFiles, setFiles, downloadUsingPresi
       <ul className='h-80 overflow-auto'>
         {files.map((file) => (
           <FileItem
-            key={file.id}
             file={file}
-            fetchFiles={fetchFiles}
-            setFiles={setFiles}
+            pathfile={pathfile}
             downloadUsingPresignedUrl={downloadUsingPresignedUrl}
           />
         ))}
-      </ul>
+      </ul> 
     </div>
   )
 }

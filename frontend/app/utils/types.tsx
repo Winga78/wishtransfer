@@ -15,10 +15,17 @@ export type FileProps = ShortFileProp & {
 
 export type FilesListProps = {
   files: FileProps[];
+  pathfile: string;
   fetchFiles: () => Promise<void>;
   setFiles: (
     files: FileProps[] | ((files: FileProps[]) => FileProps[]),
   ) => void;
+  downloadUsingPresignedUrl: boolean;
+};
+
+export type FileItemProps = {
+  file: FileProps;
+  pathfile: string;
   downloadUsingPresignedUrl: boolean;
 };
 

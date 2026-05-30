@@ -1,9 +1,5 @@
-import Link from 'next/link'
 import { LoadSpinner } from './LoadSpinner'
 import { type UploadFilesFormUIProps } from '../utils/types'
-
-// Remplissage de la constante avec le lien de ton projet WishTransfer
-const GIT_HUB_REPO_LINK = "https://github.com/Winga78/wishtransfer";
 
 export function UploadFilesFormUI({
   isLoading,
@@ -21,15 +17,6 @@ export function UploadFilesFormUI({
       </h1>
       <p className="text-lg text-gray-600">{`Total file(s) size should not exceed ${maxFileSize} MB`}</p>
       
-      <Link
-        href={GIT_HUB_REPO_LINK}
-        className="text-blue-500 hover:text-blue-600 hover:underline"
-        target="_blank" // BONNE PRATIQUE : Ouvre GitHub dans un nouvel onglet
-        rel="noopener noreferrer"
-      >
-        GitHub repo
-      </Link>
-
       {isLoading ? (
         <div className="flex h-16 items-center justify-center">
           <LoadSpinner />

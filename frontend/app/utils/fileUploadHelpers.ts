@@ -77,6 +77,17 @@ export const saveFileInfoInDB = async (presignedUrls: PresignedUrlProp[]) => {
   });
 };
 
+
+export const deleteFileById = async (fileID: string) => {
+  return await fetch(`/api/files/${fileID}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fileID }),
+  });
+}
+
 /**
  * Uploads files to S3 and saves file info in DB
  * @param files files to upload
@@ -87,8 +98,7 @@ export const saveFileInfoInDB = async (presignedUrls: PresignedUrlProp[]) => {
 export const handleUpload = async (
   files: File[],
   presignedUrls: PresignedUrlProp[],
-  onUploadSuccess: () => void,
-) => {
+) : Promise<any> => {
   const uploadToS3Response = await Promise.all(
     presignedUrls.map((presignedUrl) => {
       const file = files.find(
@@ -108,8 +118,7 @@ export const handleUpload = async (
     return;
   }
 
-  await saveFileInfoInDB(presignedUrls);
-  onUploadSuccess();
+  return await saveFileInfoInDB(presignedUrls);
 };
 
 /**
@@ -144,3 +153,5 @@ export function createFormData(files: File[]): FormData {
   });
   return formData;
 }
+
+
